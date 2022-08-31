@@ -1,23 +1,64 @@
 #include <iostream>
 #include <cuda_runtime.h>
 
+#include <png++/png.hpp>
+
 #include "map.cuh"
 #include "rgba.cuh"
 #include "camera.cuh"
-#include "object.cuh"
-#include "hitable.cuh"
 #include "dim.cuh"
+#include "timer.h"
+
 #include "sphere.cuh"
+#include "triangle.cuh"
+#include "mesh.cuh"
+
+#include "kernel.cuh"
 
 using namespace lm;
 
 int main() {
     
-    Sphere sphere({ 0, 0, 0 }, 1);
+    Camera camera(
+        { 5.0, 0.0, 0.0 }, 
+        { 0.0, 0.0, 0.0 },
+        3840, 2160, 45);
 
-    Ray ray({-5, 0, 0}, {0, 1, 0});
+    map<rgba> frame;
 
-    std::cout << sphere.intersect(ray).has_value() << std::endl;
+    {
+        Timer timer("render");
+        frame = render(camera);
+    }
+
+    png::image<png::rgba_pixel> png(frame.width(), frame.height());
+
+    {
+        Timer timer("copy");
+        #pragma omp parallel for
+        for (int y = 0; y < frame.height(); ++y) {
+            #pragma omp parallel for
+            for(int x = 0; x < frame.width(); ++x) {
+                rgba color = frame(x, y);
+
+                png[y][x].red   = color.r;
+                png[y][x].green = color.g;
+                png[y][x].blue  = color.b;
+                png[y][x].alpha = color.a;
+                
+            }
+        }
+    }
+    
+
+    {
+        Timer timer("save");
+        png.write("frame.png");
+    }
+
+    if (cudaError error = cudaGetLastError()) {
+        std::cout << cudaGetErrorString(error) << std::endl;
+    }
     
     return 0;
 }
