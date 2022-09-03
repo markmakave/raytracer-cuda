@@ -12,7 +12,6 @@ namespace lm {
 //
 __global__
 void build_sphere(Sphere* ptr, dim pos, float radius) {
-    printf("Building sphere on the device\n");
     new(ptr) Sphere(pos, radius);
 }
 
@@ -63,7 +62,6 @@ Sphere::intersect(const Ray& ray) const {
 
     } else {
         // TODO (tangent case)
-        printf("TANGENT CASE\n");
     }
 
     return impact;

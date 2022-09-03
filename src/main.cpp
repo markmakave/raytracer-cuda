@@ -20,19 +20,20 @@ using namespace lm;
 
 int main() {
 
-    Mesh mesh("../resource/cube.stl");
-    Sphere sphere({0,0,0}, 1);
+    cudaSetDevice(0);
+
+    Mesh mesh("../resource/awp.stl");
 
     Camera camera(
-        { 5.0, 5.0, 2.0 }, 
-        { 0.0, 0.0, 0.0 },
-        4000, 4000, 30);
+        { 120.0, -120.0, 40.0 }, 
+        { 0.0, -35.0, 0.0 },
+        1920 * 2, 1080 * 2, 45);
 
     map<rgba> frame;
 
     {
         Timer timer("render");
-        frame = render(camera, sphere);
+        frame = render(camera, mesh);
     }
 
     png::image<png::rgba_pixel> png(frame.width(), frame.height());
@@ -53,7 +54,6 @@ int main() {
             }
         }
     }
-    
 
     {
         Timer timer("save");

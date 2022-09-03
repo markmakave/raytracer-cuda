@@ -28,7 +28,8 @@ public:
     Hitable(const dim& position = { 0.0, 0.0, 0.0 }) : Object(position) {}
 
     __host__ __device__
-    virtual optional<Impact> intersect(const Ray& ray) const = 0;
+    virtual 
+    optional<Impact> intersect(const Ray& ray) const = 0;
 
     __host__
     virtual

@@ -84,7 +84,7 @@ map<rgba> render(const Camera& camera, const Hitable& object) {
     cudaMemcpy(dev_frame, &_frame, sizeof(frame), cudaMemcpyHostToDevice);
 
     int tx = 8, ty = 8;
-    dim3 blocks(frame.width() / tx + 1, frame.height() / 8 + 1), threads(tx, ty);
+    dim3 blocks(frame.width() / tx + 1, frame.height() / ty + 1), threads(tx, ty);
     _render <<<blocks, threads>>> (dev_frame, dev_camera, dev_object);
     cudaDeviceSynchronize();
 
