@@ -18,7 +18,7 @@ public:
     ~Timer() {
         auto end = std::chrono::high_resolution_clock::now();
         auto difference = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-        std::cout << "Scope \"" << name << "\" took " << difference << " microseconds\n";
+        std::cout << "Scope \"" << name << "\" took " << difference / 1000000.0 << " seconds\n";
     }
 
 };

@@ -9,26 +9,30 @@
 #include "dim.cuh"
 #include "timer.h"
 
-#include "sphere.cuh"
-#include "triangle.cuh"
-#include "mesh.cuh"
+#include "hitable/sphere.cuh"
+#include "hitable/triangle.cuh"
+#include "hitable/mesh.cuh"
+#include "hitable/world.cuh"
 
-#include "kernel.cuh"
+#include "render.cuh"
 
 using namespace lm;
 
 int main() {
-    
+
+    Mesh mesh("../resource/cube.stl");
+    Sphere sphere({0,0,0}, 1);
+
     Camera camera(
-        { 5.0, 0.0, 0.0 }, 
+        { 5.0, 5.0, 2.0 }, 
         { 0.0, 0.0, 0.0 },
-        3840, 2160, 45);
+        4000, 4000, 30);
 
     map<rgba> frame;
 
     {
         Timer timer("render");
-        frame = render(camera);
+        frame = render(camera, sphere);
     }
 
     png::image<png::rgba_pixel> png(frame.width(), frame.height());
@@ -55,10 +59,6 @@ int main() {
         Timer timer("save");
         png.write("frame.png");
     }
-
-    if (cudaError error = cudaGetLastError()) {
-        std::cout << cudaGetErrorString(error) << std::endl;
-    }
-    
+        
     return 0;
 }

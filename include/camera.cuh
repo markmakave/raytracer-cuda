@@ -4,7 +4,7 @@
 
 #include "dim.cuh"
 #include "object.cuh"
-#include "hitable.cuh"
+#include "ray.cuh"
 
 namespace lm {
 
@@ -17,6 +17,10 @@ class Camera : public Object {
 
 public:
 
+    //
+    //  Camera constructor baseon on its position and target
+    //  width and height in pixels and fov can also be provided
+    //
     __host__ __device__
     Camera(const dim& position, const dim& target, int width = 640, int height = 480, float fov = 45.0) 
         : _width(width), _height(height), Object(position), direction((target - position).normal())
@@ -35,16 +39,37 @@ public:
         y_step = -y_offset / (height / 2);
     }
 
+    //
+    //  CUDA transfering method for Object inheritance
+    //
+    __host__
+    Camera* replicate() const {
+        Camera* devptr;
+        cudaMalloc((void**)&devptr, sizeof(*this));
+        cudaMemcpy(devptr, this, sizeof(*this), cudaMemcpyHostToDevice);
+        return devptr;
+    }
+
+    //
+    //  Camera screen width getter
+    //
     __host__ __device__
     int width() const {
         return _width;
     }
 
+    //
+    //  Camera screen height getter
+    //
     __host__ __device__
     int height() const {
         return _height;
     }
 
+    //
+    //  Camera ray casting method
+    //  returns Ray object based on (x, y) coordinates on camera screen
+    //
     __host__ __device__ 
     Ray cast(int x, int y) const {
         return Ray(this->position, corner + x_step * x + y_step * y);
