@@ -13,8 +13,8 @@ include_directories(
     /usr/local/cuda-10.2/include
 )
 
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fopenmp")
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS}")
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fopenmp -O3")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --use_fast_math")
 
 cuda_add_executable(raytracer 
     ./src/main.cpp
